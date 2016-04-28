@@ -40,8 +40,24 @@ Add this to your `.vimrc`
 let g:ctrlp_extensions = ['header', 'other_extensions']
 ```
 
-This extension create a new command `:CtrlPHeader`, you can map it to anything
-you like:
+# `CtrlPHeader`
+
+you can use `CtrlPHeader` command to include normal stype header like this:
+
+```
+#include <string>
+```
+
+# `CtrlPEHeader`
+
+you can use `CtrlPEHeader` command to include normal header with `extren "C"`
+guard like this:
+
+```
+extern "C" { #include <libswscale/swscale.h> }
+```
+
+you can map this two command to some short cut like this
 
 ```
 nnoremap <silent> <Leader>i :CtrlPHeader<CR>

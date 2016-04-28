@@ -10,6 +10,8 @@ if ( exists('g:loaded_ctrlp_header') && g:loaded_ctrlp_header )
 endif
 let g:loaded_ctrlp_header = 1
 
+" private {{{
+
 " c Standard header list from 'http://en.cppreference.com/w/c/header' {{{
 let s:default_c_header_list = [
 			\ 'assert.h',
@@ -164,8 +166,6 @@ let s:default_cpp_header_list = [
 			\]
 " }}} ctrlp_cpp_header_list
 
-" private {{{
-
 " The default header list that soupport
 let s:default_header_dict = {
 			\ 'c'   : s:default_c_header_list,
@@ -199,10 +199,6 @@ endfunction
 " Return: The line below which to insert new #include
 "
 function! s:insert_position()
-	" TODO: fix this
-	" extern xxx {
-	"     #include xxx
-	" }
 	let pos = search("#include", 'bn')
 
 	return pos
@@ -216,7 +212,7 @@ endfunction
 "  a:filetype		the filetype to check
 "
 " Return:				1 if supported, 0 otherwise
-function! s:is_support_type(filetype)
+function! s:is_support_type(filetype) " {{{
 	" lazy init support_types
 	if empty(s:support_types)
 		if exists('g:ctrlp_header_path')
@@ -227,7 +223,7 @@ function! s:is_support_type(filetype)
 	endif
 
 	return index(s:support_types, a:filetype) >=0 ? 1 : 0
-endfunction
+endfunction " }}}
 
 " Get filetype of buffer
 "
@@ -277,7 +273,7 @@ endfunction
 "
 " Return:				The candidate header list
 "
-function! s:load_header_list(filetype)
+function! s:load_header_list(filetype) " {{{
 	if !exists('g:ctrlp_header_path')
 		return s:default_header_list(a:filetype)
 	endif
@@ -289,7 +285,7 @@ function! s:load_header_list(filetype)
 	endfor
 
 	return headers
-endfunction
+endfunction " }}}
 
 " Check whether we already have candidates list for a:filetype
 "
@@ -311,7 +307,7 @@ endfunction
 "  A Vim's List of candidate headers if filetype is supported
 "  A empty List otherwise
 "
-function! s:header_list(filetype)
+function! s:header_list(filetype) " {{{
 	let headers = []
 
 	if s:is_support_type(a:filetype)
@@ -323,9 +319,21 @@ function! s:header_list(filetype)
 	endif
 
 	return headers
+endfunction " }}}
+
+" string generators {{{
+function! s:default_string_generator(str)
+	return '#include <' . a:str . '>'
 endfunction
 
+function! s:extent_string_generator(str)
+	return  'extern "C" { #include <' . a:str . '> }'
+endfunction
+" }}} string generators
+
 " }}} private
+
+" public {{{
 
 call add(g:ctrlp_ext_vars, {
 			\ 'init': 'ctrlp#header#init(s:crbufnr)',
@@ -385,7 +393,7 @@ function! ctrlp#header#accept(mode, str)
 		call append(dstlnum, '')
 	endif
 
-	let content = '#include <' . a:str . '>'
+	let content = call(s:Generator, [a:str])
 	call append(dstlnum, content)
 endfunction
 
@@ -396,5 +404,20 @@ let s:id = g:ctrlp_builtins + len(g:ctrlp_ext_vars)
 function! ctrlp#header#id()
 	return s:id
 endfunction
+
+" Include header like this: #include <xxxx>
+function! ctrlp#header#header()
+	let s:Generator = function('s:default_string_generator')
+	call ctrlp#init(s:id)
+endfunction
+
+" Include header like this:
+" extern "C" { #inlcude <xxxx.h> }
+function! ctrlp#header#eheader()
+	let s:Generator = function('s:extent_string_generator')
+	call ctrlp#init(s:id)
+endfunction
+
+" }}}
 
 " vim:nofen:fdl=0:ts=2:sw=2:sts=2
