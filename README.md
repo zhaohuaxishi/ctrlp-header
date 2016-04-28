@@ -34,6 +34,12 @@ Its not very powerful now, I just get standard header from
 
 # Usage
 
+Add this to your `.vimrc`
+
+```
+let g:ctrlp_extensions = ['header', 'other_extensions']
+```
+
 This extension create a new command `:CtrlPHeader`, you can map it to anything
 you like:
 
