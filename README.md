@@ -40,7 +40,7 @@ Add this to your `.vimrc`
 let g:ctrlp_extensions = ['header', 'other_extensions']
 ```
 
-# `CtrlPHeader`
+# `CtrlPHeader` command
 
 you can use `CtrlPHeader` command to include normal stype header like this:
 
@@ -48,7 +48,7 @@ you can use `CtrlPHeader` command to include normal stype header like this:
 #include <string>
 ```
 
-# `CtrlPEHeader`
+# `CtrlPEHeader` command
 
 you can use `CtrlPEHeader` command to include normal header with `extren "C"`
 guard like this:
