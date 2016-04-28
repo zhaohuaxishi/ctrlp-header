@@ -14,7 +14,17 @@ Its not very powerful now, I just get standard header from
 
 # Demo
 
-![ctrlp-header-demon][]
+# cpp
+
+![ctrlp-header-demon][democpp]
+
+[democpp]: http://blog.guorongfei.com/img/posts/ctrlp-header-cpp.gif
+
+# c
+
+![ctrlp-header-demon][democ]
+
+[democ]: http://blog.guorongfei.com/img/posts/ctrlp-header-c.gif
 
 # Requirement
 
