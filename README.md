@@ -2,7 +2,7 @@
 
 Use ctrlp.vim to include C/CPP standard header
 
-This is my first vim plugin, and i Shamelessly copy same code from
+This is my first vim plugin, and i shamelessly copy same code from
 [ctrlp-funky][funky]
 
 [funky]: https://github.com/tacahiroy/ctrlp-funky
