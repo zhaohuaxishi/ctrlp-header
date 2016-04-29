@@ -335,7 +335,7 @@ endfunction
 
 " public {{{
 
-call add(g:ctrlp_ext_vars, {
+let s:ctrlp_header_var = {
 			\ 'init': 'ctrlp#header#init(s:crbufnr)',
 			\ 'accept': 'ctrlp#header#accept',
 			\ 'lname': 'include header',
@@ -343,7 +343,13 @@ call add(g:ctrlp_ext_vars, {
 			\ 'type': 'path',
 			\ 'sort': 0,
 			\ 'specinput': 0,
-			\ })
+			\ }
+
+if exists('g:ctrlp_ext_vars') && !empty(g:ctrlp_ext_vars)
+  let g:ctrlp_ext_vars = add(g:ctrlp_ext_vars, s:ctrlp_header_var)
+else
+  let g:ctrlp_ext_vars = [s:ctrlp_header_var]
+endif
 
 " Provide a list of strings to search in
 "
