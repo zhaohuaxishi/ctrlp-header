@@ -34,12 +34,6 @@ Its not very powerful now, I just get standard header from
 
 # Usage
 
-Add this to your `.vimrc`
-
-```
-let g:ctrlp_extensions = ['header', 'other_extensions']
-```
-
 # `CtrlPHeader` command
 
 you can use `CtrlPHeader` command to include normal stype header like this:
