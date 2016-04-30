@@ -192,14 +192,42 @@ function! s:trim(str)
 	return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
 endfunction
 
+" Check whether the content is include instruction
+"
+" Arguments:	the content to check
+"
+" Return:			1 if true, 0 otherwise
+function! s:is_include_instruction(content)
+	let include_instructions = [
+				\ '#include\s*<[^>]*>',
+				\ 'extern\s*C"\s*{\s*#include\s*<[^>]*>\s*}'
+				\ ]
+	for instruction in include_instructions
+		if match(a:content, instruction) == 0
+			return 1
+		endif
+	endfor
+
+	return 0
+endfunction
+
 " Find the position to insert header include command
-" This Function will search backward to find the neares #include
-" If not found, just return line 0
+"
+" If current line contains include instruction, this function will just return
+" current line number, which means to insert new include instruction below
+" current line.
+"
+" Otherwise, it will search backward to find the neares #include instruction,
+" if not found, just return line 0
 "
 " Return: The line below which to insert new #include
 "
-function! s:insert_position()
-	let pos = search("#include", 'bn')
+function! s:get_insert_position()
+	if s:is_include_instruction(getline('.'))
+		let pos = line('.')
+	else
+		let pos = search("#include", 'bn')
+	endif
 
 	return pos
 endfunction
@@ -392,15 +420,16 @@ endfunction
 function! ctrlp#header#accept(mode, str)
 	call ctrlp#exit()
 
-	let dstlnum = s:insert_position()
+	let pos = s:get_insert_position()
 
 	" if next line is not empty, insert new empty line
-	if !empty(s:trim(getline(dstlnum + 1)))
-		call append(dstlnum, '')
+	let next_line = s:trim(getline(pos + 1))
+	if !empty(next_line) && !s:is_include_instruction(next_line)
+		call append(pos, '')
 	endif
 
 	let content = call(s:Generator, [a:str])
-	call append(dstlnum, content)
+	call append(pos, content)
 endfunction
 
 " Give the extension an ID
