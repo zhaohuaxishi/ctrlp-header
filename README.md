@@ -2,11 +2,6 @@
 
 Use ctrlp.vim to include C/CPP standard header
 
-This is my first vim plugin, and i shamelessly copy same code from
-[ctrlp-funky][funky]
-
-[funky]: https://github.com/tacahiroy/ctrlp-funky
-
 Its not very powerful now, I just get standard header from
 
  - cpp : http://en.cppreference.com/w/cpp/header
