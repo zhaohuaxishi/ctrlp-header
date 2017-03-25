@@ -229,7 +229,7 @@ function! s:get_insert_position()
 		let pos = search("#include", 'bn')
 	endif
 
-	return pos
+  return pos
 endfunction
 
 " Check whether a:filetype is an supported type.
@@ -350,7 +350,7 @@ function! s:header_list(filetype) " {{{
 endfunction " }}}
 
 " string generators {{{
-function! s:default_string_generator(str)
+function! s:generate_include_instruction(str)
 	return '#include <' . a:str . '>'
 endfunction
 
@@ -420,16 +420,48 @@ endfunction
 function! ctrlp#header#accept(mode, str)
 	call ctrlp#exit()
 
-	let pos = s:get_insert_position()
+  let pos = s:get_insert_position()
+  let content = s:generate_include_instruction(a:str)
 
-	" if next line is not empty, insert new empty line
-	let next_line = s:trim(getline(pos + 1))
-	if !empty(next_line) && !s:is_include_instruction(next_line)
-		call append(pos, '')
-	endif
+python3 << EOF
+import vim
 
-	let content = call(s:Generator, [a:str])
-	call append(pos, content)
+def skip_head_comment(buf):
+  beg, end = 0, 0
+  comments = ("//", "/*")
+  while buf[end][:2] in comments:
+    if buf[end][:2] == "//":
+      # skil whole block of c++ comment
+      while buf[end].startswith("//"):
+        end += 1
+    else:
+      # skil whole c comment
+      while "*/" not in buf[end]:
+        end += 1
+
+      # insert at next line
+      end += 1
+
+  # header is comment, append additional line for readability
+  if end != beg:
+    buf.append("", end)
+    end += 1
+
+  return end
+
+pos = int(vim.eval("pos"))
+buf = vim.current.buffer
+if pos == 0:
+  pos = skip_head_comment(buf)
+
+content = vim.eval("content")
+
+# append additional line for readablility
+if not buf[pos].startswith("#include") and len(buf[pos]):
+  buf.append("", pos)
+
+buf.append(content, pos)
+EOF
 endfunction
 
 " Give the extension an ID
@@ -442,14 +474,6 @@ endfunction
 
 " Include header like this: #include <xxxx>
 function! ctrlp#header#header()
-	let s:Generator = function('s:default_string_generator')
-	call ctrlp#init(s:id)
-endfunction
-
-" Include header like this:
-" extern "C" { #inlcude <xxxx.h> }
-function! ctrlp#header#eheader()
-	let s:Generator = function('s:extent_string_generator')
 	call ctrlp#init(s:id)
 endfunction
 
